@@ -1,1 +1,15 @@
+martinize2 -f com_start.pdb -x com_cg.pdb -o com.top -ff martini3001 -p backbone -dssp -go
+
+insane -f com_cg.pdb -o CG.gro -p system.top -pbc cubic -box 15,15,15 -salt 0.15 -sol W -d 0 -center
+
+edit system.top to change atom numbers of W, NA and CL  after [ molecules ]
+
+gmx grompp -p system.top -c CG.gro -f em.mdp -o em.tpr -r CG.gro
+gmx mdrun -v -deffnm em
+
+gmx grompp -p system.top -c em.gro -f eq.mdp -o eq.tpr -r em.gro -maxwarn 1
+gmx mdrun -v -deffnm eq
+
+gmx grompp -p system.top -c eq.gro -f md.mdp -o md.tpr
+gmx mdrun -v -deffnm md -nt 10 -nb cpu -pme cpu -pmefft cpu -bonded cpu -update cpu
 
